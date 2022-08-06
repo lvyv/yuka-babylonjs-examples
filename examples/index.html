@@ -1,316 +1,369 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="A JavaScript library for developing Game AI" />
+<html>
 
-    <title>Yuka | Examples with Babylon.js</title>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-    <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
-    
-    <link href="css/app.css" rel="stylesheet" />
-    <link rel="shortcut icon" type="image/x-icon" href="https://mugen87.github.io/yuka/favicon.ico" />
-  </head>
+  <title>轨迹</title>
 
-  <body>
-    <nav class="navbar navbar-expand-md fixed-top container" >
-        
-      <h3 style="color: rgb(187, 70, 75);">Yuka + Babylon.js Examples</h3>
-      
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarsExampleDefault"
-        aria-controls="navbarsExampleDefault"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
+  <!-- Babylon.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
+  <script src="https://assets.babylonjs.com/generated/Assets.js"></script>
+  <script src="https://preview.babylonjs.com/ammo.js"></script>
+  <script src="https://preview.babylonjs.com/cannon.js"></script>
+  <script src="https://preview.babylonjs.com/Oimo.js"></script>
+  <script src="https://preview.babylonjs.com/earcut.min.js"></script>
+  <script src="https://preview.babylonjs.com/babylon.js"></script>
+  <script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+  <script src="https://preview.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+  <script src="https://preview.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+  <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+  <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+  <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
+  <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
 
-      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+  <style>
+    html,
+    body {
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
 
-            <ul class="navbar-nav ml-auto ">
-              <li class="nav-item">
-                <a class="nav-link" href="https://github.com/eldinor/yuka-babylonjs-examples" target="_blank">Examples at Github</a>
-              </li>
-          <li class="nav-item">
-            <a class="nav-link" href="https://mugen87.github.io/yuka/docs/" target="_blank">Yuka Documentation</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+    #renderCanvas {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+  </style>
+</head>
 
-    <main role="main">
-      <div class="container" style="padding-top: 3rem">
-        <div class="row">
-          <div class="col-sm-8">
-        <h1>Game AI Examples with Babylon.js<br/><small class="text-50">All what you need for a web-based 3D game</small></h1>
+<body>
+  <div><a href="example-list.html">示例</a>
+    <canvas id="renderCanvas"></canvas>
+  </div>
+  <script>
+    var canvas = document.getElementById("renderCanvas");
 
-        <br />
+    var startRenderLoop = function (engine, canvas) {
+      engine.runRenderLoop(function () {
+        if (sceneToRender && sceneToRender.activeCamera) {
+          sceneToRender.render();
+        }
+      });
+    }
 
-        <h3>Autonomous Agent Design</h3>
+    var engine = null;
+    var scene = null;
+    var sceneToRender = null;
+    var createDefaultEngine = function () { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, disableWebGL2Support: false }); };
+    class Playground {
+      static scene;
+      static priviewTarget;
+      static CreateScene(engine, canvas) {
+        // This creates a basic Babylon Scene object (non-mesh)
+        var scene = new BABYLON.Scene(engine);
+        // This creates and positions a free camera (non-mesh)
+        let camera = new BABYLON.ArcRotateCamera('ArcRotateCamera', 0, 0, 20, new BABYLON.Vector3(0, 5, 0), scene);
+        camera.setPosition(new BABYLON.Vector3(0, 5, -20));
+        camera.wheelPrecision = 50;
+        camera.lowerRadiusLimit = 2;
+        camera.upperRadiusLimit = 100;
+        camera.attachControl(canvas, true);
+        scene.createDefaultLight();
+        // create reference object
+        let ground = BABYLON.MeshBuilder.CreateGround('ground', { width: 100, height: 100 });
+        ground.position.set(0, -10, 0);
+        let mat = new BABYLON.StandardMaterial('groundMat', scene);
+        mat.emissiveColor = BABYLON.Color3.Red();
+        mat.disableLighting = true;
+        ground.material = mat;
+        let mat1 = new BABYLON.StandardMaterial('red', scene);
+        mat1.diffuseColor = BABYLON.Color3.Random();
+        let mat2 = new BABYLON.StandardMaterial('red', scene);
+        mat2.diffuseColor = BABYLON.Color3.Random();
+        let mat3 = new BABYLON.StandardMaterial('red', scene);
+        mat3.diffuseColor = BABYLON.Color3.Random();
+        let box1 = BABYLON.MeshBuilder.CreateBox('box1', { size: 1 });
+        box1.material = mat1;
+        box1.position.set(-6, 0, 0);
+        let box2 = BABYLON.MeshBuilder.CreateBox('box2', { size: 1 });
+        box2.material = mat2;
+        box2.position.set(5, -2, -1);
+        let box3 = BABYLON.MeshBuilder.CreateBox('box3', { size: 1 });
+        box3.material = mat3;
+        box3.position.set(5, 3, -1);
+        let box4 = BABYLON.MeshBuilder.CreateBox('box4', { size: 1 });
+        box4.material = mat1;
+        box4.position.set(5, 7, 5);
+        let box5 = BABYLON.MeshBuilder.CreateBox('box5', { size: 1 });
+        box5.material = mat2;
+        box5.position.set(5, 3, 5);
+        let box6 = BABYLON.MeshBuilder.CreateBox('box6', { size: 1 });
+        box6.material = mat3;
+        box6.position.set(0, -7, 5);
+        this.priviewTarget = BABYLON.MeshBuilder.CreateBox('box', { size: 1 });
+        let m1 = BABYLON.MeshBuilder.CreateCylinder('head', { height: 2, diameterTop: 0, diameterBottom: 1, tessellation: 20, subdivisions: 20 }, scene);
+        m1.parent = this.priviewTarget;
+        m1.position.z = 1.5;
+        m1.rotation.set(Math.PI / 2, 0, 0);
+        let m2 = BABYLON.MeshBuilder.CreateCylinder('head2', { height: 1, diameterTop: 0, diameterBottom: 1, tessellation: 20, subdivisions: 20 }, scene);
+        m2.parent = this.priviewTarget;
+        m2.position.y = 1;
+        m2.rotation.set(0, 0, 0);
+        let pts = [new BABYLON.Vector3(-5, 0, 0), new BABYLON.Vector3(0, 20, 0), new BABYLON.Vector3(5, 10, 0),
+        new BABYLON.Vector3(10, 12, 0), new BABYLON.Vector3(15, 8, 0)]
+        let pathPositions = pts;
+        let pathRoot = new BABYLON.TransformNode('Path');
+        let utilLayer = new BABYLON.UtilityLayerRenderer(scene);
+        let line = new BezierLine('bezier', pathPositions, 100, scene, pathRoot, utilLayer);
+        scene.onKeyboardObservable.add((kbInfo) => {
+          if (kbInfo.type === BABYLON.KeyboardEventTypes.KEYDOWN && kbInfo.event.keyCode === 32) {
+            if (line) {
+              this.PreviewAnimation(line);
+            }
+          }
+        });
+        this.scene = scene;
+        return scene;
+      }
+      static PreviewAnimation(line) {
+        var aniPositions = line.GetPositions();
+        let translateAni = new BABYLON.Animation('path', 'position', 60, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        let translateKeys = [];
+        for (let index = 0; index < aniPositions.length; index++) {
+          let position = aniPositions[index];
+          translateKeys.push({
+            frame: index,
+            value: position
+          });
+        }
+        translateAni.setKeys(translateKeys);
+        this.priviewTarget.animations.push(translateAni);
+        let rotateAni = new BABYLON.Animation('rotate', 'rotationQuaternion', 60, BABYLON.Animation.ANIMATIONTYPE_QUATERNION, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        let rotateKeys = [];
+        let node = new BABYLON.TransformNode('rot');
+        for (let index = 0; index < aniPositions.length - 1; index++) {
+          let pos = aniPositions[index];
+          let next_pos = aniPositions[index + 1];
+          node.position = pos;
+          node = node.lookAt(next_pos);
+          let qua = BABYLON.Quaternion.FromEulerAngles(node.rotation.x, node.rotation.y, node.rotation.z);
+          rotateKeys.push({
+            frame: index,
+            value: qua
+          });
+        }
+        rotateAni.setKeys(rotateKeys);
+        this.priviewTarget.animations.push(rotateAni);
+        let t = this.scene.beginDirectAnimation(this.priviewTarget, this.priviewTarget.animations, 0, aniPositions.length, true);
+        node.dispose();
+      }
+    }
+    class BezierLine {
+      control1;
+      control2;
+      name;
+      pointNumber;
+      scene;
+      updateLine = false;
+      parent;
+      pathPositions = [];
+      contorlPoints = [];
+      bezierlines = [];
+      /**
+       *
+       */
+      constructor(name, pathPositions, pointNumber, scene, parent, utilLayer) {
+        this.name = name;
+        this.pointNumber = pointNumber;
+        this.parent = parent;
+        this.scene = scene;
+        this.pathPositions = pathPositions;
+        for (let index = 0; index < this.pathPositions.length; index++) {
+          const position = this.pathPositions[index];
+          let control = new ControlPoint(index.toString(), position, parent, this.scene, utilLayer);
+          this.contorlPoints.push(control);
+          control.onControlMove = () => {
+            this.OnControlMove(index);
+          };
+        }
+        for (let i = 1; i < this.pathPositions.length; i++) {
+          const point = this.pathPositions[i - 1];
+          const next_point = this.pathPositions[i];
+          const control1 = this.contorlPoints[i - 1];
+          const control2 = this.contorlPoints[i];
+          let line = new BezierLineSegment(point, control1, control2, next_point, this.scene, this.parent);
+          this.bezierlines.push(line);
+        }
+      }
+      OnControlMove(index) {
+        let leftLine = this.bezierlines[index - 1];
+        if (leftLine) {
+          leftLine.ReDrawLine(2);
+        }
+        let rightLine = this.bezierlines[index];
+        if (rightLine) {
+          rightLine.ReDrawLine(1);
+        }
+      }
+      GetPositions() {
+        let positions = [];
+        for (let i = 0; i < this.bezierlines.length; i++) {
+          const line = this.bezierlines[i];
+          Array.prototype.push.apply(positions, line.GetPositions());
+        }
+        return positions;
+      }
+    }
+    class BezierLineSegment {
+      control1;
+      control2;
+      origin;
+      destination;
+      line;
+      pointNumber = 100;
+      bezier;
+      scene;
+      parent;
+      /**
+       *
+       */
+      constructor(origin, control1, control2, destination, scene, parent) {
+        this.origin = origin;
+        this.control1 = control1;
+        this.control2 = control2;
+        this.destination = destination;
+        this.scene = scene;
+        this.parent = parent;
+        this.CreateLine();
+      }
+      CreateLine() {
+        this.bezier = BABYLON.Curve3.CreateCubicBezier(this.origin, this.control1.point.position, this.control2.point.position, this.destination, this.pointNumber);
+        this.line = BABYLON.MeshBuilder.CreateLines('bezierLine', { points: this.bezier.getPoints(), updatable: true }, this.scene);
+        this.line.parent = this.parent;
+      }
+      ReDrawLine(index) {
+        let c1 = this.control1.point.position;
+        let c2 = this.control2.point.position;
+        c1 = this.origin.multiplyByFloats(2, 2, 2).subtract(c1);
+        this.bezier = BABYLON.Curve3.CreateCubicBezier(this.origin, c1, c2, this.destination, this.pointNumber);
+        this.line = BABYLON.MeshBuilder.CreateLines('trajactory', { points: this.bezier.getPoints(), updatable: true, instance: this.line }, this.scene);
+      }
+      GetPositions() {
+        this.bezier.getPoints().pop();
+        return this.bezier.getPoints();
+      }
+    }
+    class ControlPoint {
+      pathLines = [];
+      controlLine;
+      point;
+      parent;
+      utilLayer;
+      initPosition;
+      scene;
+      updateControlLine = false;
+      name;
+      onControlMove;
+      isMove = false;
+      /**
+       *
+       */
+      constructor(name, initPosition, parent, scene, utilLayer) {
+        this.name = name;
+        this.initPosition = initPosition;
+        this.parent = parent;
+        this, utilLayer = utilLayer;
+        this.scene = scene;
+        this.CreateControlPoint();
+        this.CreateControlLine();
+        scene.registerBeforeRender(() => {
+          if (this.isMove) {
+            this.onControlMove();
+          }
+        });
+      }
+      /**
+       * ?????
+       * @param position
+       */
+      CreateControlPoint() {
+        this.point = BABYLON.MeshBuilder.CreateSphere('controlPoint' + this.name, { segments: 10, diameter: 0.1 });
+        this.point.position = new BABYLON.Vector3(this.initPosition.x, this.initPosition.y, this.initPosition.z);
+        this.AddAxis(this.point);
+        this.point.parent = this.parent;
+      }
+      /**
+       * ????????
+       * @param point
+       */
+      AddAxis(point) {
+        let gizmo = new BABYLON.PositionGizmo(this.utilLayer);
+        gizmo.attachedMesh = point;
+        gizmo.onDragStartObservable.add(() => {
+          this.isMove = true;
+          this.updateControlLine = true;
+          console.log('start', this.updateControlLine);
+        });
+        gizmo.onDragEndObservable.add(() => {
+          this.isMove = false;
+          this.updateControlLine = false;
+          console.log('end');
+        });
+      }
+      /**
+       * ????????
+       */
+      CreateControlLine() {
+        this.controlLine = BABYLON.MeshBuilder.CreateLines('controlLine' + this.name, { points: [this.initPosition, this.point.position], updatable: true }, this.scene);
+        // TODO:????????
+        this.controlLine.parent = this.parent;
+        this.controlLine.color = BABYLON.Color3.Yellow();
+        if (this.scene) {
+          this.scene.registerBeforeRender(() => {
+            if (this.updateControlLine) {
+              this.controlLine = BABYLON.MeshBuilder.CreateLines(null, { points: [this.initPosition, this.point.position], updatable: true, instance: this.controlLine }, this.scene);
+            }
+          });
+        }
+      }
+      AttachToline(pathLine) {
+        if (this.pathLines.length < 3) {
+          this.pathLines.push(pathLine);
+        }
+      }
+    }
 
-        <br />
-
-        <h5><a href="./js/fsm/" target="_blank">State-driven Agent Design</a></h5>
-        <p>The Finite State Machine enables a clean implementation of basic AI logic for every entity. The State-driven Agent Design is still most commonly used AI method in games.</p>
-        <hr />
-        <br />
-
-        <h5><a href="./js/goal/" target="_blank">Goal-driven Agent Design</a></h5>
-				<p>The Goal-driven agent design enables a clean implementation of more advanced AI logic with simple Goals and Composite Goals.</p>
-         <hr />
-        <br />
-       
-				<h5><a href="./js/spacecarrier/" target="_blank">Space Carrier</a> <span class="badge  bg-primary text-light">New</span></h5>
-				<p>In this example an autonomous State-driven agent (a small spaceship) collects red artefacts inside the sphere. After collecting 2 artefacts it goes to the base to unload cargo.</p>
-
-				<br/>
-      
-				<h3>Fuzzy Logic</h3>
-
-				<br/>
-
-				<h5><a href="./js/fuzzy/" target="_blank">Weapon Selection</a></h5>
-				<p>The soldier's weapon selection is implemented via fuzzy inference. In fuzzy logic, the truth of any statement becomes just a matter of a degree.</p>
-
-				<br/>
-
-				<h3>Graphs and Navigation</h3>
-        <br/>
-
-<!--
-				<h5><a href="./graph/basic/" target="_blank">Graphs</a></h5>
-				<p>Demonstrates basic graph search algorithms.</p>
-				<hr/>
--->
-				<h5><a href="./js/graph/tictactoe/" target="_blank">Tic-Tac-Toe</a></h5>
-				<p>An implementation of the MinMax algorithm based on Yuka's graph class.</p>
-				<hr/>
-
-				<h5><a href="./js/navigation/navmesh/" target="_blank">Navigation Mesh (Basic)</a></h5>
-				<p>A simple showcase of a navigation mesh.</p>
-				<hr/>
-
-				<h5><a href="./js/navigation/navmeshPerformance/" target="_blank">Navigation Mesh (Advanced)</a></h5>
-				<p>An advanced showcase that shows the usage of a spatial index and tasks.</p>
-				<hr/>
-
-				<h5><a href="./js/navigation/firstperson/" target="_blank">First-Person Controls</a></h5>
-				<p>First-Person example with navigation mesh usage to restrict movement.</p>
-
-				<br/>
-
-        <h5><a href="./js/graph/corridor/" target="_blank">Corridor Algorithm</a> <span class="badge  bg-primary text-light">New</span></h5>
-				<p> A corridor is a sequence of portal edges representing a walkable way
-          within a navigation mesh. The algorithm class is able to find the shortest path through this corridor as a
-          sequence of waypoints.</p>
-
-				<br/>
-
-				<h3>Math</h3>
-
-				<br/>
-<!--
-				<h5><a href="./math/boundingVolumes/" target="_blank">Bounding Volumes</a></h5>
-				<p>Demonstrates different types of auto-generated bounding volumes.</p>
-				<hr/>
-
-				<h5><a href="./math/bvh/" target="_blank">Bounding Volume Hierarchy (BVH)</a></h5>
-				<p>Enables faster intersection tests by introducing a hierarchy of bounding volumes for a single geometry.</p>
-				<hr/>
--->
-				<h5><a href="./js/math/orientation/" target="_blank">Orientation</a></h5>
-				<p>Demonstrates how to orient a game entity towards a specific target.</p>
-
-				<br/>
-
-				<h3>Misc</h2>
-
-				<br/>
-
-				<h5><a href="./js/misc/savegame/" target="_blank">Savegames</a></h5>
-				<p>Shows how the current game state can be saved and loaded.</p>
-				<hr/>
-
-				<h5><a href="./js/misc/trigger/" target="_blank">Triggers</a></h5>
-				<p>Usage of triggers to dynamically generate actions in the game world.</p>
-
-				<br/>
-
-				<h3>Perception</h3>
-
-				<br/>
-
-				<h5><a href="./js/perception/lineOfSight/" target="_blank">Line of Sight</a></h5>
-				<p>Demonstrates a basic line of sight test.</p>
-				<hr/>
-
-				<h5><a href="./js/perception/memorySystem/" target="_blank">Memory System</a></h5>
-				<p>Enables game entites to have a short-term memory so they react in a more natural way.</p>
-
-				<br/>
-
-        <h3>Steering Behaviors</h3>
-
-        <br />
-
-        <h5><a href="./js/steering/arrive/" target="_blank">Arrive Steering Behavior</a></h5>
-        <p>This behavior steers the agent in such a way it decelerates onto the target position.</p>
-        <hr />
-
-				<h5><a href="./js/steering/flee/" target="_blank">Flee Steering Behavior</a></h5>
-				<p>Produces a force that steers an agent away from a target position.</p>
-				<hr/>
-
-        <h5><a href="./js/steering/flocking/" target="_blank">Flocking Steering Behavior</a></h5>
-        <p>A group steering behavior based on "Alignment", "Cohesion" and "Separation".</p>
-        <hr />
-
-        <h5><a href="./js/steering/followPath/" target="_blank">Follow Path Steering Behavior</a></h5>
-        <p>Produces a force that moves a vehicle along a series of waypoints.</p>
-        <hr />
-
-        <h5><a href="./js/steering/interpose/" target="_blank">Interpose Steering Behavior</a></h5>
-        <p>Produces a force that moves a vehicle to the midpoint of the imaginary line connecting two other agents.</p>
-        <hr />
-
-        <h5><a href="./js/steering/obstacleAvoidance/" target="_blank">Obstacle Avoidance Steering Behavior</a></h5>
-        <p>Produces a force so a vehicle avoids obstacles lying in its path.</p>
-        <hr />
-
-        <h5><a href="./js/steering/offsetPursuit/" target="_blank">Offset Pursuit Steering Behavior</a></h5>
-        <p>Produces a force that keeps a vehicle at a specified offset from a leader vehicle.</p>
-        <hr />
-
-        <h5><a href="./js/steering/pursuit/" target="_blank">Pursuit Steering Behavior</a></h5>
-        <p>Useful when an agent is required to intercept a moving agent.</p>
-        <hr />
-
-        <h5><a href="./js/steering/seek/" target="_blank">Seek Steering Behavior</a></h5>
-        <p>Produces a force that directs an agent toward a target position.</p>
-        <hr />
-
-        <h5><a href="./js/steering/wander/" target="_blank">Wander Steering Behavior</a></h5>
-        <p>Produces a force that will give the impression of a random walk through the agent’s environment.</p>
-
-        <br />
-     
-				<h3>Playground</h3>
-
-				<br/>
-
-				<h5><a href="./js/playground/shooter/" target="_blank">First-Person Shooter</a></h5>
-				<p>Basic concepts of FPS like simulating bullets and collision detection.</p>
-				<hr/>
- 
-				<h5><a href="./js/playground/hideAndSeek/" target="_blank">Hide And Seek</a></h5>
-				<p>A little game that experiments with steering and shooter mechanics.</p>
-				<hr/>
-        <br/>
-
-        <h4>The work in progress, more examples and showcases will follow!</h4>
-        <br/>
-        <p>
-        <a href="https://github.com/eldinor/yuka-babylonjs-examples" class="btn btn-outline-secondary">Examples at Github</a>
-      </p>
-
-      </div>
-      <div class="col=sm-4 mx-4 ">
-        <div class="card" style="width: 20rem;">
-          <a href="https://www.babylonjs.com/" target="_blank">
-          <img style="width: 220px;" src="https://raw.githubusercontent.com/BabylonJS/Brand-Toolkit/master/babylonjs_identity/fullColor/babylonjs_identity_color.svg" class="" alt="...">
-        </a>
-          <div class="card-body ">
- 
-            <p class="card-text">One of the most powerful, beautiful and simple 3D Web rendering engines in the world.</p>
-            <a href="https://www.babylonjs.com/" class="btn btn-outline-secondary" target="_blank">Go to Babylon</a>
-          </div>
-        </div>
-<br/>
-<br/>
-        <div class="card" style="width: 20rem; ">
-          <a href="https://mugen87.github.io/yuka/" target="_blank">
-          <img style="width: 98px;"  src="https://mugen87.github.io/yuka/images/logo_header.png" class="m-4" alt="...">
-          </a>
-        <div class="card-body">
-            <h5 class="card-title">Autonomous Agent Design</h5>
-            <p class="card-text">Yuka provides a basic game entity concept and classes for state-driven and goal-driven agent design.</p>
-            
-            <h5 class="card-title">Steering and Navigation</h5>
-            <p class="card-text">Use the build-in vehicle model and steering behaviors in order to develop moving game entities. Graph classes, search algorithms and a navigation mesh implementation enables advanced path finding.</p>
-          
-            <h5 class="card-title">Perception and Triggers</h5>
-            <p class="card-text">Create game entities with a short-term memory and a vision component. Use triggers to generate dynamic actions in your game.</p>
-            
-
-            <a href="https://mugen87.github.io/yuka/" class="btn btn-outline-secondary" target="_blank">Go to Yuka</a>
-          </div>
-        </div>
-        <br/>
-        <br/>
-        <div class="card" style="width: 20rem;">
-          <div class="card-body ">
-            <h5 class="card-title">Download</h5>
-            <a href="https://github.com/eldinor/yuka-babylonjs-examples" class="btn btn-outline-secondary" target="_blank">Examples at Github</a>
-          </div>
-        </div>
-        <br/>
-        <br/>
-        <div class="card" style="width: 20rem;">
-          <div class="card-body ">
-            <h5 class="card-title">Typescript Template</h5>
-            <p>Yuka Game AI + Babylon.js Typescript Starter Pack</p>
-            <a href="https://github.com/eldinor/yuka-babylonjs-ts-starter" class="btn btn-outline-secondary" target="_blank">Github</a>
-          </div>
-        </div>
-        <br/>
-        <br/>
-        <div class="card" style="width: 20rem;">
-          <div class="card-body ">
-            <h5 class="card-title ">Examples Contributors</h5>
-            <a href="https://forum.babylonjs.com/u/labris/summary" target="_blank" >
-              <img class="rounded-circle w-25 float-left" src="https://sea2.discourse-cdn.com/business7/user_avatar/forum.babylonjs.com/labris/240/12576_2.png" alt="">
-                <p class="float-right p-3">Andrei Stepanov</p>
-            </a>
+    createScene = function () { return Playground.CreateScene(engine, engine.getRenderingCanvas()); }
+    window.initFunction = async function () {
 
 
-            <div class="clearfix m-3"></div>
-            <a href="https://forum.babylonjs.com/u/roland/summary" target="_blank">
-              <img class="rounded-circle w-25 float-left" src="https://sea2.discourse-cdn.com/business7/user_avatar/forum.babylonjs.com/roland/240/18498_2.png" alt="">
-                <p class="float-right p-3">Roland Csibrei</p>
-            </a>
-          </div>
-        </div>
+      var asyncEngineCreation = async function () {
+        try {
+          return createDefaultEngine();
+        } catch (e) {
+          console.log("the available createEngine function failed. Creating the default engine instead");
+          return createDefaultEngine();
+        }
+      }
 
-      </div>
-    </div>
-    <!-- /row -->
-      </div>
-      <!-- /container -->
-    </main>
+      window.engine = await asyncEngineCreation();
+      if (!engine) throw 'engine should not be null.';
+      startRenderLoop(engine, canvas);
+      window.scene = createScene();
+    };
+    initFunction().then(() => {
+      sceneToRender = scene
+    });
 
-    <footer class="container-fluid  mt-5">
-      <div class="container pt-3">
-        <br />
-      <p>&copy; Babylon.js <br/>&copy; Yuka Game AI Library</p>
-      <p><small>Many thanks to Michael Herzog for YUKA and for the first Babylon.js example!</small></p>
+    // Resize
+    window.addEventListener("resize", function () {
+      engine.resize();
+    });
+  </script>
+</body>
 
-      <br />
-    </div>
-    </footer>
-
-    <!-- Bootstrap core JavaScript
-		================================================== -->
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-      crossorigin="anonymous"
-    ></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js" integrity="sha384-VHvPCCyXqtD5DqJeNxl2dtTyhF78xXNXdkwX1CZeRusQfRKp+tA7hAShOK/B/fQ2" crossorigin="anonymous"></script>
-  </body>
 </html>

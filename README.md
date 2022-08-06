@@ -1,26 +1,33 @@
-# yuka-babylonjs-examples
+# AI行为建模
 
-### Yuka Game AI + 3D rendering with Babylon.js.
+行为建模是利用电脑模拟现实对象，让孪生体具有一定的行为，在孪生世界中做出各种行为，c从而与人进行交互。电子游戏中的电脑AI是最早的应用，随着技术发展，也可以用到很多仿真场景，如下的一些场景是AI行为建模的应用领域。
 
-#### Live examples at https://yuka.babylonpress.org/examples/
+1）保障场景要仿真路径规划是否合理，可以用若干Agent的AI行为模拟现场其它人员车辆，以验证AGV的智能行为是否合理；
 
-Yuka library source: https://github.com/Mugen87/yuka
+2）试验场景通过模拟若干拦截行为，以验证飞行器突防能力；
 
-Babylon.js 3D engine source: https://github.com/BabylonJS/Babylon.js
+3）测控场景模拟飞行器的飞行轨迹，检查测控台站的协同与通信行为，以验证试验方案的合理性；
 
-# Installation
+4）训练场景模拟对抗方的行为，以检验指挥官或操作手的能力。
 
-## VS Code extensions to install
+行为建模和3D可视化相结合，采用[AI 行为库](https://github.com/Mugen87/yuka)
+和[3D 渲染库](https://github.com/BabylonJS/Babylon.js)。
 
-https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
+[参考例程](https://yuka.babylonpress.org/examples/)。
 
-https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer
 
-## How to run the examples
+# 运行环境
+需要有一个python的虚拟环境以运行后台web服务，因要根据不同文件类型提供MIME的type信息给浏览器，因此不能是python简单的http.server。
+在vs code环境下，ctrl+shift+p，选择python的interpret虚拟环境，之后ctrl+`可以打开一个新的终端，进入python虚拟环境。
 
-Open the `index.html` file located in `examples/js/example_dir` with LiveServer in VS Code.
+## 如何运行例程
 
-## Best practices
+在项目根路径的命令行下，运行如下命令。
+```
+（venv）PS E:\_proj\yuka-babylonjs-examples> python server.py
+```
+
+## 最佳实践
 
 1. try to avoid parented `TransformNodes` with YUKA. YUKA will place your object in world space.Use YUKA's parenting instead.
 2. you **must** scale, rotate and position your mesh before registering it as a YUKA `renderComponent` and bake the transformations into the vertices and freeze the world matrix of your mesh before doing so.

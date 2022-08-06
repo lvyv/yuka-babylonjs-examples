@@ -1,4 +1,4 @@
-import 'https://preview.babylonjs.com/babylon.js'
+import '../../babylon.js'
 
 export const VehicleTypes = {
   default: 0,

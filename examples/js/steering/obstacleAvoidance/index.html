@@ -1,16 +1,26 @@
-<html lang="en">
-  <head>
-    <title>Yuka | Steering Behaviors | Obstacle Avoidance</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="../../../css/styles.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="https://mugen87.github.io/yuka/favicon.ico" />
-  </head>
-  <body>
-    <section id="info">
-      <p>This steering behavior produces a force so a vehicle avoids obstacles lying in its path.</p>
-    </section>
-    <canvas id="renderCanvas" style="width: 100%; height: 100%; touch-action: none"></canvas>
-    <script type="module" src="index.js"></script>
-  </body>
+<html>
+<head>
+  <title>仿真场景对象管理示例</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="../../../css/styles.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" />
+</head>
+<body>
+  <section id="info">
+    
+    <div id="createPNGButton" style="width:300px;height:160;float:left;display:inline">
+      <p>带智能障碍规避的导航对象</p>
+      <button id="snapCanvas">抓图</button>
+      <button id="pauseScene">暂停</button>
+      <p/>
+      <div style="border:1px solid #efefef">
+        <img id="previewImg" src="snag.png" style="opacity:0.5;height:100%;width:100%"/>
+      </div> 
+    </div>
+
+  </section>
+  <canvas id="renderCanvas" style="width: 100%; height: 100%; touch-action: none"></canvas>
+  <script type="module" src="index.js"></script>
+</body>
 </html>

@@ -1,8 +1,8 @@
 import * as YUKA from '../../../../lib/yuka.module.js'
 // import * as DAT from 'https://cdn.jsdelivr.net/npm/dat.gui@0.7.7/build/dat.gui.module.js';
 
-import 'https://preview.babylonjs.com/babylon.js'
-import 'https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js'
+import '../../../../babylon.js'
+import '../../../../babylonjs.materials.min.js'
 import { createVehicle } from '../../creator.js'
 // import 'https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js'
 // import 'https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js'
